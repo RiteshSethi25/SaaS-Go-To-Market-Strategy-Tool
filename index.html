@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GTM Operating System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1B3A6B;--navy-dk:#0D2040;--navy-lt:#D5E8F0;--gold:#C9A84C;--gold-lt:#FEF9EC;--red:#C62828;--red-lt:#FFEBEE;--orange:#E65100;--orange-lt:#FFF3E0;--blue:#0D47A1;--blue-lt:#E3F2FD;--green:#2E7D32;--green-lt:#E8F5E9;--bg:#F4F4F0;--white:#fff;--text:#1a1a1a;--muted:#666;--border:#ddd;--success:#2E7D32;--warn:#E65100;--danger:#C62828;--great:#0D47A1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.hdr{background:var(--navy);color:#fff;padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hdr h1{font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:1px}
+.hdr-badge{background:var(--gold);color:var(--navy-dk);padding:3px 10px;border-radius:3px;font-size:10px;font-weight:800;letter-spacing:.5px}
+.prog{background:#fff;border-bottom:1px solid var(--border);padding:.625rem 1.5rem;display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.prog::-webkit-scrollbar{display:none}
+.pi{display:flex;align-items:center;gap:6px;flex:1;min-width:90px;cursor:pointer;padding:.2rem .4rem;border-radius:4px;transition:background .15s}
+.pi:hover{background:var(--bg)}
+.pn{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1.5px solid var(--border);color:var(--muted);background:#fff;flex-shrink:0;transition:all .2s}
+.pn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pn.done{background:var(--success);color:#fff;border-color:var(--success)}
+.pt{font-size:10px;color:var(--muted);line-height:1.3}
+.pt strong{display:block;font-size:11px;color:var(--text)}
+.pt strong.a{color:var(--navy)}
+.pdiv{width:1px;background:var(--border);margin:0 2px;flex-shrink:0;align-self:stretch}
+.main{max-width:920px;margin:0 auto;padding:1.25rem 1.25rem 4rem}
+.card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:1.125rem 1.25rem;margin-bottom:1rem}
+.ctitle{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.875rem;display:flex;align-items:center;gap:6px}
+.ctitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.field{margin-bottom:.75rem}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px;font-family:inherit;background:#fff;color:var(--text);transition:border-color .15s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(27,58,107,.1)}
+.sw{margin-bottom:1.125rem}
+.st{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.sn{font-size:13px;font-weight:600}
+.sv{font-size:22px;font-weight:800;color:var(--navy);min-width:30px;text-align:right}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--border);border-radius:2px;cursor:pointer;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--navy);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.sh{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px}
+.sh span{max-width:46%;line-height:1.3}
+.sh span:last-child{text-align:right}
+.btn{padding:8px 16px;border:none;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-p{background:var(--navy);color:#fff}
+.btn-p:hover{background:var(--navy-dk)}
+.btn-g{background:var(--gold);color:var(--navy-dk)}
+.btn-g:hover{opacity:.9}
+.btn-s{background:#fff;color:var(--text);border:1px solid var(--border)}
+.btn-s:hover{background:var(--bg)}
+.navrow{display:flex;justify-content:space-between;align-items:center;padding-top:.875rem;margin-top:.25rem;border-top:1px solid var(--border)}
+.mc{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.75rem .875rem}
+.ml{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px}
+.mv{font-size:20px;font-weight:800;line-height:1.1}
+.mf{font-size:11px;font-weight:700;margin-top:3px}
+.ms{font-size:10px;color:var(--muted);margin-top:2px}
+.c-great{color:var(--great)}.c-good{color:var(--success)}.c-warn{color:var(--warn)}.c-bad{color:var(--danger)}
+.hidden{display:none!important}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:700}
+.ba{background:var(--red-lt);color:var(--red)}.bb{background:var(--orange-lt);color:var(--orange)}.bc{background:var(--blue-lt);color:var(--blue)}.bd{background:var(--green-lt);color:var(--green)}.bnavy{background:var(--navy);color:#fff}.bgold{background:var(--gold-lt);color:#854F0B;border:1px solid #C9A84C}
+.arm-live{background:var(--navy);color:#fff;border-radius:8px;padding:.875rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+.arm-score{font-size:30px;font-weight:900}
+.arm-label{font-size:10px;opacity:.65;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.sec-div{display:flex;align-items:center;gap:12px;margin:1.5rem 0 1rem}
+.sec-div span{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.sec-div::before,.sec-div::after{content:'';flex:1;height:1px;background:var(--border)}
+.odg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.odg-o{background:var(--red-lt);border-radius:6px;padding:.875rem;border-left:3px solid var(--red)}
+.odg-o h4{font-size:10px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.odg-d{background:var(--blue-lt);border-radius:6px;padding:.875rem;border-left:3px solid var(--blue)}
+.odg-d h4{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.odg-g{background:var(--orange-lt);border-radius:6px;padding:.875rem;border-left:3px solid var(--orange)}
+.odg-g h4{font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.odg-o ul,.odg-d ul,.odg-g ul{padding-left:13px;font-size:12px;line-height:1.85;color:var(--text)}
+.wi{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:flex-start}
+.wi:last-child{border:none}
+.wi-ico{color:var(--warn);flex-shrink:0;margin-top:1px;font-size:15px}
+.pri{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.pri:last-child{border:none}
+.pri-n{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.fw-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.875rem}
+.fw-t{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.ibox{border-left:3px solid var(--navy);background:#EEF3FB;padding:.75rem 1rem;border-radius:0 6px 6px 0;font-size:13px;margin:.5rem 0}
+.gbox{border-left:3px solid var(--gold);background:var(--gold-lt);padding:.75rem 1rem;border-radius:0 6px 6px 0;font-size:13px;margin:.5rem 0}
+.wbox{border-left:3px solid var(--warn);background:#FFF8F0;padding:.75rem 1rem;border-radius:0 6px 6px 0;font-size:13px;margin:.5rem 0}
+.rbox{border-left:3px solid var(--red);background:var(--red-lt);padding:.75rem 1rem;border-radius:0 6px 6px 0;font-size:13px;margin:.5rem 0}
+.spec-wrap{position:relative;margin:1rem 0 .25rem}
+.spec-bar{height:10px;background:linear-gradient(to right,#C62828,#E65100,#0D47A1,#2E7D32);border-radius:5px}
+.spec-mk{position:absolute;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transform:translateX(-50%);transition:left .6s cubic-bezier(.34,1.56,.64,1)}
+.spec-labs{display:flex;justify-content:space-between;margin-top:5px;font-size:9px;color:var(--muted)}
+.bench-r{display:grid;grid-template-columns:110px 1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.bench-r:last-child{border:none}
+.abar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.abar-f{height:100%;background:var(--navy);border-radius:3px}
+.proj-g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:.75rem}
+.proj-c{text-align:center;background:var(--bg);border-radius:6px;padding:.75rem;border:1px solid var(--border)}
+.proj-y{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.proj-v{font-size:18px;font-weight:800;color:var(--navy)}
+.dt-q{background:#fff;border:1px solid var(--border);border-radius:7px;padding:.875rem 1rem;margin-bottom:8px}
+.dt-q p{font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.5}
+.dt-btns{display:flex;gap:8px}
+.dt-btn{padding:5px 14px;border:1px solid var(--border);border-radius:4px;font-size:12px;cursor:pointer;font-weight:600;font-family:inherit;background:#fff;transition:all .15s}
+.dt-btn.yes.sel{background:var(--green-lt);border-color:var(--green);color:var(--green)}
+.dt-btn.no.sel{background:var(--red-lt);border-color:var(--red);color:var(--red)}
+.sc-table{width:100%;border-collapse:collapse;font-size:12px}
+.sc-table th{background:var(--navy);color:#fff;padding:7px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.05em}
+.sc-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.sc-table tr:last-child td{border:none}
+.sc-table tr:nth-child(even) td{background:var(--bg)}
+.rd{width:9px;height:9px;border-radius:50%;border:1px solid var(--border);display:inline-block;margin-right:2px}
+.rd.f{background:var(--navy);border-color:var(--navy)}
+.rhdr{background:var(--navy);color:#fff;border-radius:8px;padding:1.5rem;margin-bottom:1rem}
+.rhdr h2{font-size:21px;font-weight:800;margin-bottom:3px}
+.rhdr p{font-size:13px;opacity:.75;font-style:italic}
+.phase-hdr{background:var(--navy-dk);color:#fff;padding:.5rem 1rem;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin:1.5rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.co-chip{display:inline-flex;align-items:center;padding:2px 8px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;font-weight:600;margin:2px}
+.budget-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)}
+.budget-row:last-child{border:none}
+.strain-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:flex-start}
+.strain-item:last-child{border:none}
+.finding-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.finding-item:last-child{border:none}
+.finding-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--gold-lt);color:#854F0B;align-items:center;justify-content:center;font-size:10px;font-weight:800;border:1px solid var(--gold);margin-right:8px;flex-shrink:0;vertical-align:top;margin-top:1px}
+.ext-src{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:center}
+.ext-src:last-child{border:none}
+.ext-num{font-weight:700;color:var(--navy);min-width:28px}
+.chart-wrap{position:relative}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.g2,.g3,.g4,.g5,.odg,.two-col{grid-template-columns:1fr}.bench-r{grid-template-columns:1fr auto}}
+@media print{.hdr,.prog,.navrow,.btn,.no-print{display:none}.card{break-inside:avoid;page-break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div style="display:flex;align-items:center;gap:10px">
+      
+      <h1>GTM Operating System</h1>
+    </div>
+    <div class="hdr-sub">ARM Control-Placement Framework</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:10px;color:rgba(255,255,255,.5)">The Real GTM Scaling Problem in Enterprise SaaS</span>
+    <button class="btn btn-g no-print" onclick="window.print()" style="padding:5px 12px;font-size:12px">Print / Export</button>
+  </div>
+</div>
+
+<div class="prog" id="prog">
+  <div class="pi" onclick="goStep(1)"><div class="pn active" id="pn1">1</div><div class="pt"><strong class="a">Company</strong>Profile & Market</div></div>
+  <div class="pdiv"></div>
+  <div class="pi" onclick="goStep(2)"><div class="pn" id="pn2">2</div><div class="pt"><strong>ARM Diagnostic</strong>5 Dimensions</div></div>
+  <div class="pdiv"></div>
+  <div class="pi" onclick="goStep(3)"><div class="pn" id="pn3">3</div><div class="pt"><strong>Financials</strong>CAC · LTV · R40</div></div>
+  <div class="pdiv"></div>
+  <div class="pi" onclick="goStep(4)"><div class="pn" id="pn4">4</div><div class="pt"><strong>GTM Profile</strong>Partners & Model</div></div>
+  <div class="pdiv"></div>
+  <div class="pi" onclick="goStep(5)"><div class="pn" id="pn5">5</div><div class="pt"><strong>Decision Tree</strong>6 Questions</div></div>
+  <div class="pdiv"></div>
+  <div class="pi" onclick="if(resultsBuilt)goStep(6)"><div class="pn" id="pn6">→</div><div class="pt"><strong>GTM Strategy</strong>Full Output</div></div>
+</div>
+
+<div class="main">
+
+<!-- ─── STEP 1 ─── -->
+<div id="step1">
+<div class="card">
+<div class="ctitle">Company profile</div>
+<div class="g2">
+<div class="field"><label>Company name</label><input type="text" id="coName" placeholder="e.g. SapphireIMS"/></div>
+<div class="field"><label>Industry sector</label>
+<select id="sector"><option value="">Select sector</option><option>B2B SaaS (horizontal)</option><option>Healthcare IT / SaaS</option><option>FinTech / BankingTech</option><option>HR Tech / WorkTech</option><option>Security / Cybersecurity</option><option>Infrastructure / DevOps</option><option>CRM / Sales Tech</option><option>ERP / Supply Chain</option><option>Vertical SaaS (other)</option></select></div>
+</div>
+<div class="g2">
+<div class="field"><label>Company stage</label>
+<select id="stage"><option value="early">Early — under $1M ARR</option><option value="growth" selected>Growth — $1M–$10M ARR</option><option value="scale">Scale — $10M–$50M ARR</option><option value="enterprise">Enterprise — $50M+ ARR</option></select></div>
+<div class="field"><label>Current ARR (USD)</label><input type="number" id="arr" placeholder="e.g. 5000000" step="100000"/></div>
+</div>
+<div class="g2">
+<div class="field"><label>YoY revenue growth rate (%)</label><input type="number" id="growthRate" placeholder="e.g. 45" step="1"/></div>
+<div class="field"><label>Total active customers</label><input type="number" id="totalCusts" placeholder="e.g. 240" step="1"/></div>
+</div>
+</div>
+<div class="card">
+<div class="ctitle">Target market definition</div>
+<div class="g2">
+<div class="field"><label>Primary buyer persona</label>
+<select id="buyerPersona"><option value="">Select buyer</option><option value="cxo">C-Suite (CEO/CFO/CTO/CMO)</option><option value="vp">VP / Director level</option><option value="manager">Manager / Team lead</option><option value="ic">Individual contributor / end-user</option><option value="it">IT / Technical buyer</option><option value="procurement">Procurement / Ops</option></select></div>
+<div class="field"><label>Primary target company size</label>
+<select id="targetSize"><option value="">Select size</option><option value="smb">SMB (under 100 employees)</option><option value="midmarket">Mid-market (100–1,000)</option><option value="enterprise">Enterprise (1,000–10,000)</option><option value="largeenterprise">Large Enterprise (10,000+)</option></select></div>
+</div>
+<div class="g2">
+<div class="field"><label>Average sales cycle length</label>
+<select id="salesCycle"><option value="">Select range</option><option value="days">Days (self-serve / PLG)</option><option value="weeks1">1–4 weeks</option><option value="weeks12">1–3 months</option><option value="months36">3–6 months</option><option value="months612">6–12 months</option><option value="months12p">12+ months</option></select></div>
+<div class="field"><label>Number of stakeholders in a typical deal</label>
+<select id="stakeholders"><option value="">Select range</option><option value="1">1 (self-serve)</option><option value="2">2–3 (small team)</option><option value="4">4–6 (department)</option><option value="7">7–12 (cross-functional)</option><option value="12p">12+ (enterprise committee)</option></select></div>
+</div>
+</div>
+<div class="navrow"><span></span><button class="btn btn-p" onclick="goStep(2)">ARM Diagnostic →</button></div>
+</div>
+
+<!-- ─── STEP 2 ─── -->
+<div id="step2" class="hidden">
+<div class="arm-live">
+<div><div class="arm-label">Live ARM score</div><div class="arm-score" id="armScoreLive">—</div></div>
+<div style="text-align:center"><div class="arm-label">GTM Spectrum</div><div id="specPos" style="font-size:13px;font-weight:700;margin-top:4px;color:rgba(255,255,255,.9)">—</div></div>
+<div style="text-align:right"><div class="arm-label">Archetype</div><div id="archLive" style="margin-top:4px"><span class="badge bnavy">—</span></div></div>
+</div>
+<div class="card">
+<div class="ctitle">ARM diagnostic — rate each dimension 1 (low) to 10 (high)</div>
+<style>
+.dim-desc{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:5px;margin-bottom:4px}
+.dd{font-size:9px;color:var(--muted);line-height:1.3;padding:3px 4px;background:var(--bg);border-radius:3px;border:1px solid var(--border);text-align:center}
+.dd strong{display:block;font-size:9px;font-weight:800;color:var(--navy);margin-bottom:1px}
+</style>
+
+<div class="sw">
+<div class="st"><span class="sn">1. Product complexity</span><span class="sv" id="v1">5</span></div>
+<input type="range" min="1" max="10" value="5" step="1" id="s1" oninput="sUpdate()"/>
+<div class="dim-desc">
+<div class="dd"><strong>1–2</strong>Single-feature tool, plug-and-play, no workflow change needed</div>
+<div class="dd"><strong>3–4</strong>Multi-feature, some setup, light onboarding required</div>
+<div class="dd"><strong>5–6</strong>Cross-department, configuration needed, admin training required</div>
+<div class="dd"><strong>7–8</strong>Deep integrations, data migration, process re-engineering</div>
+<div class="dd"><strong>9–10</strong>Mission-critical, multi-system, 6–18 month implementation</div>
+</div></div>
+
+<div class="sw">
+<div class="st"><span class="sn">2. Buyer complexity</span><span class="sv" id="v2">5</span></div>
+<input type="range" min="1" max="10" value="5" step="1" id="s2" oninput="sUpdate()"/>
+<div class="dim-desc">
+<div class="dd"><strong>1–2</strong>Single user buys for themselves, credit card checkout</div>
+<div class="dd"><strong>3–4</strong>Team lead or manager decides, 1–2 approvals</div>
+<div class="dd"><strong>5–6</strong>Department head + IT sign-off, 3–5 stakeholders</div>
+<div class="dd"><strong>7–8</strong>VP/Director + procurement + legal, 6–10 stakeholders</div>
+<div class="dd"><strong>9–10</strong>C-suite committee + board approval, 10+ stakeholders, 12+ month cycle</div>
+</div></div>
+
+<div class="sw">
+<div class="st"><span class="sn">3. Deployment burden</span><span class="sv" id="v3">5</span></div>
+<input type="range" min="1" max="10" value="5" step="1" id="s3" oninput="sUpdate()"/>
+<div class="dim-desc">
+<div class="dd"><strong>1–2</strong>Live in hours — click, sign up, use immediately</div>
+<div class="dd"><strong>3–4</strong>1–4 weeks — basic setup, data import, team training</div>
+<div class="dd"><strong>5–6</strong>1–3 months — configuration, integrations, user onboarding</div>
+<div class="dd"><strong>7–8</strong>3–6 months — custom workflows, data migration, IT involvement</div>
+<div class="dd"><strong>9–10</strong>6–18 months — full implementation program, dedicated project team</div>
+</div></div>
+
+<div class="sw">
+<div class="st"><span class="sn">4. Trust requirements</span><span class="sv" id="v4">5</span></div>
+<input type="range" min="1" max="10" value="5" step="1" id="s4" oninput="sUpdate()"/>
+<div class="dim-desc">
+<div class="dd"><strong>1–2</strong>Transactional — low switching cost, easy to cancel and replace</div>
+<div class="dd"><strong>3–4</strong>Moderate — some data sensitivity, vendor reputation matters</div>
+<div class="dd"><strong>5–6</strong>Significant — handles sensitive business data, SOC2 required</div>
+<div class="dd"><strong>7–8</strong>High — regulated data, compliance audits, executive sponsorship needed</div>
+<div class="dd"><strong>9–10</strong>Institutional — mission-critical, regulatory mandated, reputational risk if it fails</div>
+</div></div>
+
+<div class="sw" style="margin-bottom:0">
+<div class="st"><span class="sn">5. PLG / viral viability</span><span class="sv" id="v5">5</span></div>
+<input type="range" min="1" max="10" value="5" step="1" id="s5" oninput="sUpdate()"/>
+<div class="dim-desc">
+<div class="dd"><strong>1–2</strong>No self-serve path — every deal requires a sales conversation</div>
+<div class="dd"><strong>3–4</strong>Limited trial possible but conversion needs sales assist</div>
+<div class="dd"><strong>5–6</strong>Free tier exists, some self-serve, sales needed for enterprise</div>
+<div class="dd"><strong>7–8</strong>Strong free-to-paid funnel, organic word-of-mouth, team virality</div>
+<div class="dd"><strong>9–10</strong>Naturally viral — each user invites others, bottom-up enterprise adoption</div>
+</div></div>
+</div>
+<div class="card">
+<div class="ctitle">ARM radar — your profile vs archetype benchmark</div>
+<div class="chart-wrap" style="height:280px"><canvas id="radarC" role="img" aria-label="Radar chart showing ARM dimension scores across 5 dimensions">ARM diagnostic radar chart showing product complexity, buyer complexity, deployment burden, trust requirements, and PLG viability.</canvas></div>
+</div>
+<div class="card" style="margin-bottom:0">
+<div class="ctitle">GTM spectrum position</div>
+<div class="spec-wrap">
+<div class="spec-bar"></div>
+<div class="spec-mk" id="specMk" style="left:12%"></div>
+</div>
+<div class="spec-labs">
+<span>Direct Dominant<br>Palantir</span><span style="text-align:center">Direct-Led Hybrid<br>Workday</span><span style="text-align:center">Direct+Co-Creation<br>ServiceNow</span><span style="text-align:center">Ecosystem-Led<br>Snowflake</span><span style="text-align:right">PLG+Partner<br>Atlassian/HubSpot</span>
+</div>
+</div>
+<div class="navrow"><button class="btn btn-s" onclick="goStep(1)">← Back</button><button class="btn btn-p" onclick="goStep(3)">Financial Inputs →</button></div>
+</div>
+
+<!-- ─── STEP 3 ─── -->
+<div id="step3" class="hidden">
+<div class="card">
+<div class="ctitle">Customer acquisition economics</div>
+<div class="g2">
+<div class="field"><label>New customers acquired (last 12 months)</label><input type="number" id="newCusts" placeholder="e.g. 40" step="1"/></div>
+<div class="field"><label>Total S&amp;M spend — last 12 months (USD)</label><input type="number" id="smSpend" placeholder="e.g. 2000000" step="10000"/></div>
+</div>
+<div class="g2">
+<div class="field"><label>Average Contract Value — ACV (USD)</label><input type="number" id="acv" placeholder="e.g. 60000" step="1000"/></div>
+<div class="field"><label>Average customer lifetime (years)</label><input type="number" id="lifetime" placeholder="e.g. 5" step="0.5" min="0.5"/></div>
+</div>
+</div>
+<div class="card">
+<div class="ctitle">P&amp;L and retention metrics</div>
+<div class="g2">
+<div class="field"><label>Gross margin (%)</label><input type="number" id="grossMargin" placeholder="e.g. 72" step="1" min="0" max="100"/></div>
+<div class="field"><label>EBITDA margin (%) — negative if loss-making</label><input type="number" id="ebitdaMargin" placeholder="e.g. -8" step="1"/></div>
+</div>
+<div class="g2">
+<div class="field"><label>Net Revenue Retention — NRR (%)</label><input type="number" id="nrr" placeholder="e.g. 118" step="1"/></div>
+<div class="field"><label>Partner-sourced revenue (% of ARR)</label><input type="number" id="partnerPct" placeholder="e.g. 35" step="1" min="0" max="100"/></div>
+</div>
+</div>
+<div class="card">
+<div class="ctitle">Balance sheet &amp; runway</div>
+<div class="g2">
+<div class="field"><label>Cash / runway (USD) — optional</label><input type="number" id="cash" placeholder="e.g. 8000000" step="100000"/></div>
+<div class="field"><label>Monthly net burn (USD) — optional</label><input type="number" id="burn" placeholder="e.g. 350000" step="10000"/></div>
+</div>
+</div>
+<div id="finLiveGrid" class="g4" style="margin-bottom:.5rem"></div>
+<div class="navrow"><button class="btn btn-s" onclick="goStep(2)">← Back</button><button class="btn btn-p" onclick="goStep(4)">GTM Profile →</button></div>
+</div>
+
+<!-- ─── STEP 4 ─── -->
+<div id="step4" class="hidden">
+<div class="card">
+<div class="ctitle">Current GTM motion</div>
+<div class="g2">
+<div class="field"><label>Primary GTM model today</label>
+<select id="currGTM"><option value="">Select model</option><option value="direct">Direct sales only — no channel</option><option value="directhybrid">Direct-led + delivery partners</option><option value="ecosystem">Ecosystem / hyperscaler co-sell led</option><option value="plg">Product-led growth (PLG) primary</option><option value="hybrid">Hybrid — not clearly defined</option><option value="partner">Partner / channel dominant</option></select></div>
+<div class="field"><label>Growth priority next 18 months</label>
+<select id="growthIntent"><option value="">Select priority</option><option value="newlogo">New logo acquisition</option><option value="expansion">Installed-base expansion</option><option value="geo">Geographic expansion</option><option value="upmarket">Move upmarket — larger deals</option><option value="ecosystem">Build ecosystem / marketplace</option><option value="plgscale">Scale PLG — reduce CAC</option></select></div>
+</div>
+</div>
+<div class="card">
+<div class="ctitle">Active partner types</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt1"/> Resellers / VAR</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt2"/> Implementation / SI partners</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt3"/> Technology / ISV partners</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt4"/> Agency / consulting partners</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt5"/> Hyperscaler / marketplace (AWS, Azure, GCP)</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt6"/> GSI / global systems integrators</label>
+<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="pt7"/> No active partners currently</label>
+</div>
+</div>
+<div class="card">
+<div class="ctitle">Governance maturity</div>
+<div class="sw" style="margin-bottom:0">
+<div class="st"><span class="sn" id="govLbl">Informal — no formal partner rules</span><span class="sv" id="v6">2</span></div>
+<input type="range" min="1" max="5" value="2" step="1" id="s6" oninput="govUp()"/>
+<div class="sh"><span>No governance</span><span>Fully governed ecosystem</span></div>
+</div>
+</div>
+<div class="navrow"><button class="btn btn-s" onclick="goStep(3)">← Back</button><button class="btn btn-p" onclick="goStep(5)">Decision Tree →</button></div>
+</div>
+
+<!-- ─── STEP 5: Decision Tree ─── -->
+<div id="step5" class="hidden">
+<div class="card">
+<div class="ctitle">GTM Decision Tree</div>
+<p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Answer Yes or No for each question. The decision tree determines your recommended GTM control boundary.</p>
+<div id="dtqs"></div>
+<div id="dtResult" class="hidden" style="margin-top:1rem"></div>
+</div>
+<div class="navrow"><button class="btn btn-s" onclick="goStep(4)">← Back</button><button class="btn btn-g" onclick="buildResults()" style="font-size:14px;padding:10px 24px">⚡ Generate Full GTM Strategy</button></div>
+</div>
+
+<!-- ─── RESULTS ─── -->
+<div id="step6" class="hidden">
+<div id="resContent"></div>
+<div class="navrow no-print" style="margin-top:2rem">
+<button class="btn btn-s" onclick="goStep(1)">↺ Start Over</button>
+<div style="display:flex;gap:8px">
+<button class="btn btn-s" onclick="window.print()">Print / Export PDF</button>
+</div>
+</div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+var resultsBuilt=false;
+var radarInst=null;
+var GOV_LBLS=["","Informal — no formal partner rules","Basic — some agreements, limited enforcement","Developing — certification exists, partial enforcement","Structured — scorecards, SLAs, active governance","Governed — full certification, QA, performance scoring"];
+var ARCHETYPES={
+A:{name:"Direct Dominant",tag:"Own the relationship. Own the outcome.",model:"Direct Sales-Led",refs:["Palantir"],specPct:12,color:"#C62828",bg:"#FFEBEE",bdg:"ba",
+own:["Customer relationship — end to end","Solution architecture and design","Commercial closure and pricing discipline","Account expansion ownership and orchestration","Competitive differentiation and trust-building"],
+distribute:["Geographic access in new markets (supervised)","Implementation support — tightly governed","Reference introductions for specific verticals"],
+govern:["Every partner touchpoint with explicit protocols","Implementation quality scorecards and quarterly reviews","Partner NPS vs. direct NPS compared continuously","Expansion owned internally — no partner autonomy on accounts"],
+watch:["S&M cost compression is your key operating leverage signal — monitor it every quarter","Growth becomes effort-bound without investing in repeatable playbooks and enablement","Multi-stakeholder deal velocity is your biggest cycle-time risk at scale"],
+priorities:["Build a repeatable enterprise sales playbook with stage gates and exit criteria","Invest in delivery efficiency — reduce implementation weight per deal signed","Design the expansion motion explicitly before scaling new-logo acquisition volume"],
+budgetSM:[35,50],budgetMktg:[8,12],targetCAC:[18,24],targetLTV:3.0,targetR40:40,
+partnerRoles:["Geographic access only","Supervised implementation delivery","Reference customer introductions"],
+strains:["S&M spend not compressing as revenue scales past $10M","Every new market requires a full GTM rebuild rather than extension","Multi-stakeholder deal velocity slowing as you move upmarket"],
+govMin:3},
+B:{name:"Direct-Led Hybrid",tag:"Own the trust. Distribute the execution.",model:"Direct + Certified Delivery Partners",refs:["Workday","ServiceNow"],specPct:35,color:"#E65100",bg:"#FFF3E0",bdg:"bb",
+own:["Customer relationship and executive alignment","Commercial closure and contract ownership","Solution design and architecture sign-off","Expansion motion and renewal ownership"],
+distribute:["Implementation execution to certified delivery partners","Geographic capacity through local SI partners","Tier-2 support and onboarding workflows"],
+govern:["Partner certification with annual recertification requirements","Implementation quality metrics and SLA governance","Partner-to-customer contact protocols explicitly defined","Delivery NPS tracked separately from direct-sold account NPS"],
+watch:["Boundary drift — partners must not begin owning customer trust or expansion conversations","Implementation quality variance as partner network scales beyond 20 active partners","Channel conflict if partners begin competing for expansion accounts"],
+priorities:["Build a formal partner certification program before scaling partner count beyond 10","Define an explicit boundary map — what direct owns vs. what partners execute","Invest in delivery governance infrastructure: scorecards, certification systems, QA processes"],
+budgetSM:[25,40],budgetMktg:[10,15],targetCAC:[12,18],targetLTV:3.5,targetR40:40,
+partnerRoles:["Certified implementation delivery","Geographic delivery capacity","Local technical support tier","SI co-development for GSI tier only"],
+strains:["Implementation quality inconsistency across partner-delivered accounts","Boundary drift — partners holding customer conversations without direct oversight","Rising escalation rates from partner-managed implementations"],
+govMin:4},
+C:{name:"Ecosystem-Led Hybrid",tag:"Embed the product. Compound the ecosystem.",model:"Ecosystem + Hyperscaler Co-Sell",refs:["Snowflake"],specPct:55,color:"#0D47A1",bg:"#E3F2FD",bdg:"bc",
+own:["Product roadmap and platform governance","Key enterprise accounts — top 20% by ARR","Pricing architecture and commercial terms","Ecosystem quality standards and tier criteria"],
+distribute:["Demand generation via hyperscaler co-sell relationships","Procurement access via cloud marketplace listings","Implementation capacity via certified partners","Geographic and vertical coverage"],
+govern:["Ecosystem tier performance metrics reviewed quarterly","Marketplace listing governance and ROI tracked separately","NRR attribution by channel — direct vs. ecosystem-sourced","Partner pipeline quality scoring and quarterly reviews"],
+watch:["Hyperscaler dependency — diversify if more than 40% of revenue routes through a single cloud","Consumption volatility risk on revenue forecasting in usage-based pricing models","Ecosystem governance complexity grows non-linearly beyond 50 active partners"],
+priorities:["Build hyperscaler co-sell relationships before scaling the direct sales team headcount","Price for consumption expansion from the initial contract — NRR is the primary leverage engine","Define ecosystem governance standards before partner network exceeds 50 active partners"],
+budgetSM:[15,30],budgetMktg:[15,20],targetCAC:[10,14],targetLTV:4.0,targetR40:45,
+partnerRoles:["Hyperscaler demand co-sell (AWS/Azure/GCP)","Cloud marketplace as procurement route","Certified implementation partners","ISV / technology integrations for platform stickiness"],
+strains:["Consumption volatility making revenue forecasting unreliable quarter to quarter","Ecosystem growing faster than governance capacity to manage partner quality","Hyperscaler dependency creating a single-point commercial risk"],
+govMin:3},
+D:{name:"PLG + Partner Hybrid",tag:"Let the product sell. Let partners scale.",model:"PLG + Co-Sell Partner Network",refs:["Atlassian","HubSpot"],specPct:74,color:"#2E7D32",bg:"#E8F5E9",bdg:"bd",
+own:["Core product experience and self-serve funnel quality","Enterprise commercial relationships above mid-market","Pricing, packaging, and tier architecture","Product roadmap and platform direction"],
+distribute:["Demand generation to agency and partner network","Customer retention management to certified partners","Geographic and mid-market coverage","PLG activation and onboarding playbooks"],
+govern:["Partner tier qualification and annual scoring criteria","Agency certification programs with clear renewal requirements","PLG-to-sales handoff triggers and ownership rules defined explicitly","Expansion attribution — PLG-sourced vs. partner-sourced tracked separately"],
+watch:["Enterprise upmarket friction — PLG alone will not close complex multi-stakeholder deals","S&M investment phase before the PLG flywheel fully matures takes 18–24 months","Partner quality diluting NPS and brand credibility as the network scales rapidly"],
+priorities:["Instrument the PLG funnel before scaling paid acquisition — know your activation rate exactly","Build a partner tier system with clear qualification criteria for each tier before exceeding 50 partners","Define the PLG-to-sales handoff trigger explicitly before scaling the enterprise motion"],
+budgetSM:[10,25],budgetMktg:[20,30],targetCAC:[8,12],targetLTV:5.0,targetR40:50,
+partnerRoles:["Agency-led demand upstream of the sales motion","Certified resellers for geographic scale","Implementation and onboarding partners","Technology integration partners for platform stickiness"],
+strains:["PLG acquisition cost not compressing — activation rate is below target","Enterprise deals stalling in the self-serve funnel without a sales overlay trigger","Partner-led accounts showing meaningfully lower NPS than direct accounts"],
+govMin:3}};
+
+var BENCHMARKS=[
+{name:"Palantir",arch:"A",score:12,model:"Direct Dominant",status:"core",desc:"Mission-critical, forward-deployed engineers"},
+{name:"Workday",arch:"A",score:28,model:"Direct-Led Hybrid",status:"core",desc:"Direct + SI delivery partners at scale"},
+{name:"ServiceNow",arch:"B",score:43,model:"Direct + GSI Co-Creation",status:"core",desc:"Direct + GSI industry IP co-creation model"},
+{name:"Snowflake",arch:"C",score:55,model:"Ecosystem-Led Hybrid",status:"core",desc:"Consumption NRR + hyperscaler co-sell"},
+{name:"Atlassian",arch:"D",score:77,model:"PLG + Partner Hybrid",status:"core",desc:"PLG flywheel + 40k+ partners, 50%+ partner-sourced"},
+{name:"HubSpot",arch:"D",score:72,model:"PLG + Co-Sell",status:"core",desc:"PLG + 7,000 solutions agencies"},
+{name:"New Relic",arch:"B",score:41,model:"PLG→Enterprise misfit",status:"validation",desc:"GTM misfit: PLG to enterprise without governance — restructured"},
+{name:"Zendesk",arch:"B",score:38,model:"Upmarket mismatch",status:"validation",desc:"Moved upmarket without model redesign — went private"},
+{name:"Zoom",arch:"D",score:65,model:"PLG strain",status:"validation",desc:"PLG to enterprise push — governance gap exposed"},
+{name:"Box",arch:"C",score:48,model:"Hybrid without governance",status:"validation",desc:"Hybrid model without explicit boundary governance"},
+{name:"Twilio",arch:"C",score:58,model:"Developer PLG + ecosystem",status:"validation",desc:"Developer-led PLG with platform ecosystem"}];
+
+var DT_QS=[
+{q:"Does your product require institutional trust or executive alignment to complete a commercial transaction?",y:"→ Favours retaining direct control of the commercial motion",n:"→ Commercial motion can be partially distributed"},
+{q:"Is implementation quality a direct determinant of whether the customer receives full product value?",y:"→ Delivery governance is non-negotiable",n:"→ Implementation can be distributed more freely"},
+{q:"Can your product generate detectable value for the customer without significant pre-sales or configuration effort?",y:"→ PLG or self-serve motion is structurally viable",n:"→ PLG/self-serve is not viable at this stage"},
+{q:"Would a partner in the demand-generation layer materially improve access or conversion without weakening customer signal quality?",y:"→ Demand-layer partner investment is justified",n:"→ Direct demand generation is preferable"},
+{q:"Does expansion primarily happen through account depth and relationship management rather than usage spread or workflow adoption?",y:"→ Expansion motion should remain direct-owned",n:"→ Partner-assisted expansion can compound the installed base"},
+{q:"Is your current governance infrastructure capable of maintaining partner quality at your target partner network scale?",y:"→ Governance is ready to support partner scale",n:"→ Governance investment must precede partner network scaling"}];
+
+var PATTERNS=[
+{n:1,t:"Partner position, not presence, is the organising variable",b:"All eleven companies studied use partners. The structural distinction is where they operate in the motion. This variable produces more analytically useful predictions than the direct-versus-partnership binary."},
+{n:2,t:"Complexity is a design parameter, not a constraint",b:"Front-loaded complexity builds switching costs; deferred complexity enables PLG scale. Matching complexity timing to the product's adoption pattern is as important as the model type choice."},
+{n:3,t:"Operating leverage is product-embedded, not GTM-designed",b:"The GTM model delivers leverage the product makes possible. It cannot manufacture leverage the product architecture does not support."},
+{n:4,t:"The most dangerous position is a mismatched one",b:"New Relic and Zendesk both failed not because products were weak — but because GTM architecture was mismatched to structural conditions. Mismatch is reliably worse than either extreme."},
+{n:5,t:"All hybrid models require explicit boundary governance",b:"The companies generating the clearest operating leverage have the most explicitly governed direct/partner boundaries. A hybrid model without governance is a model in decay."}];
+
+var PRESCRIPTIONS=[
+{n:1,t:"Make control placement the first step in GTM strategy",b:"The GTM model should not be selected until leadership has defined what must be owned, what can be distributed, and what requires governance before scale."},
+{n:2,t:"Design partner role intentionally — where they sit determines everything",b:"Delivery-layer partners scale execution. Demand-layer partners reduce CAC. Co-sell partners improve enterprise credibility. Retention-layer partners compound the installed base."},
+{n:3,t:"Refuse vague hybrid models — own the boundary or lose it",b:"Hybrid must mean staged control with explicit ownership and route economics. Every function needs a named owner. Every route needs tracked economics."},
+{n:4,t:"Govern route economics directly — if you cannot see it, you cannot protect it",b:"Route-level P&L visibility — direct-sourced, partner-sourced, and co-sell revenue tracked separately with associated cost and margin — is the minimum viable governance infrastructure."},
+{n:5,t:"Treat redesign triggers as part of the model from the beginning",b:"CAC rising faster than value capture, S&M not compressing after 24 months, partner leverage growing faster than governance capability — define these triggers in advance."}];
+
+var EXT_SRCS=[
+{n:1,src:"McKinsey",claim:"PLG frequently needs to be complemented by enterprise-model elements to succeed — supports PLG limit argument"},
+{n:2,src:"Bessemer Venture Partners",claim:"Adding enterprise sales to PLG is a major opportunity and potential pitfall — supports governed transition logic"},
+{n:3,src:"Microsoft",claim:"Direct, PLG, marketplace, and partner routes require different investments — supports route-design framework"},
+{n:4,src:"AWS",claim:"GTM as structured discipline for sustainable growth; marketplace supports pricing, private offers, adoption — supports ecosystem logic"},
+{n:5,src:"Crossbeam",claim:"Ecosystem-led growth as structural GTM infrastructure — supports partner-as-asset argument"},
+{n:6,src:"Forrester",claim:"State of Partner Ecosystems 2025 — supports ecosystem-as-infrastructure thesis"},
+{n:7,src:"TSIA",claim:"LAER model — supports GTM-must-govern-adoption-expansion-renewal argument"},
+{n:8,src:"Microsoft Partner Blog",claim:"Marketplace co-sell, private offers, channel mechanisms — supports procurement-route logic"},
+{n:9,src:"ITPro",claim:"Microsoft REO marketplace expansion — supports channel-led marketplace signal"},
+{n:10,src:"BCG",claim:"Rule of 40 as critical SaaS benchmark — supports efficient-growth framing [URL placeholder]"}];
+
+function getARM(){
+var s=[1,2,3,4,5].map(function(i){return parseInt(document.getElementById("s"+i).value)||5;});
+var complexity=(s[0]+s[1]+s[2]+s[3])/4;
+var plg=s[4];
+var score=complexity-(plg*0.4)+2;
+score=Math.min(10,Math.max(1,score));
+var arch="D";
+if(score>=7.5)arch="A";else if(score>=5.5)arch="B";else if(score>=3.5)arch="C";
+return{score:score,arch:arch,dims:s};
+}
+
+function getFin(){
+var arr=parseFloat(document.getElementById("arr").value)||0;
+var gr=parseFloat(document.getElementById("growthRate").value)||0;
+var nc=parseFloat(document.getElementById("newCusts").value)||0;
+var sm=parseFloat(document.getElementById("smSpend").value)||0;
+var acv=parseFloat(document.getElementById("acv").value)||0;
+var lt=parseFloat(document.getElementById("lifetime").value)||0;
+var gm=parseFloat(document.getElementById("grossMargin").value)||0;
+var ebRaw=document.getElementById("ebitdaMargin").value;var eb=ebRaw!==""&&ebRaw!==null?parseFloat(ebRaw):null;
+var nrr=parseFloat(document.getElementById("nrr").value)||0;
+var pp=parseFloat(document.getElementById("partnerPct").value)||0;
+var cash=parseFloat(document.getElementById("cash").value)||0;
+var burn=parseFloat(document.getElementById("burn").value)||0;
+var tc=parseFloat(document.getElementById("totalCusts").value)||0;
+var cac=nc>0&&sm>0?sm/nc:null;
+var ltv=acv>0&&gm>0&&lt>0?acv*(gm/100)*lt:null;
+var ltvcac=cac&&ltv?ltv/cac:null;
+var payback=cac&&acv>0&&gm>0?(cac/(acv*gm/100))*12:null;
+var r40=(gr!==0||eb!==null)&&eb!==null?gr+eb:null;
+var smPct=arr>0&&sm>0?(sm/arr)*100:null;
+var smEff=nc>0&&acv>0&&sm>0?(nc*acv)/sm:null;
+var expRev=arr>0&&nrr>0?arr*((nrr/100)-1):null;
+var runway=cash>0&&burn>0?cash/burn:null;
+var nrrF=nrr>0?nrr/100:1;var gF=1+(gr/100);
+var p1=arr>0?arr*gF*nrrF:null;
+var p2=p1?p1*gF*nrrF:null;
+var p3=p2?p2*gF*nrrF:null;
+return{arr,gr,nc,sm,acv,lt,gm,eb,nrr,pp,cash,burn,tc,cac,ltv,ltvcac,payback,r40,smPct,smEff,expRev,runway,p1,p2,p3};
+}
+
+function fUSD(v){if(v===null||isNaN(v)||v===0&&!v)return"—";if(v>=1e6)return"$"+(v/1e6).toFixed(1)+"M";if(v>=1e3)return"$"+(v/1e3).toFixed(0)+"K";return"$"+Math.round(v);}
+function fNum(v,d){if(v===null||v===undefined||isNaN(v))return"—";return d!==undefined?v.toFixed(d):Math.round(v).toString();}
+function fPct(v){if(v===null||isNaN(v))return"—";return fNum(v,1)+"%";}
+
+function mSt(v,lo,md,hi,flip){
+if(v===null||isNaN(v))return"";
+if(!flip)return v>=hi?"c-great":v>=md?"c-good":v>=lo?"c-warn":"c-bad";
+return v<=lo?"c-great":v<=md?"c-good":v<=hi?"c-warn":"c-bad";}
+
+function sUpdate(){
+for(var i=1;i<=5;i++){document.getElementById("v"+i).textContent=document.getElementById("s"+i).value;}
+var a=getARM();
+var ar=ARCHETYPES[a.arch];
+document.getElementById("armScoreLive").textContent=a.score.toFixed(1)+" / 10";
+document.getElementById("specPos").textContent=ar.model;
+document.getElementById("archLive").innerHTML='<span class="badge b'+a.arch.toLowerCase()+'">'+a.arch+" — "+ar.name+'</span>';
+document.getElementById("specMk").style.left=ar.specPct+"%";
+renderRadar(a.dims,a.arch);
+}
+
+function govUp(){
+var v=parseInt(document.getElementById("s6").value);
+document.getElementById("v6").textContent=v;
+document.getElementById("govLbl").textContent=GOV_LBLS[v]||"";
+}
+
+function renderRadar(dims,arch){
+var benchmarks={A:[9,9,8,9,2],B:[8,8,7,8,3],C:[6,7,5,6,7],D:[5,4,3,5,9]};
+var bench=benchmarks[arch]||benchmarks.B;
+var ctx=document.getElementById("radarC").getContext("2d");
+var isDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;
+var gc=isDark?"rgba(255,255,255,.1)":"rgba(0,0,0,.07)";
+var tc2=isDark?"rgba(255,255,255,.55)":"rgba(0,0,0,.45)";
+if(radarInst)radarInst.destroy();
+radarInst=new Chart(ctx,{type:"radar",data:{labels:["Product complexity","Buyer complexity","Deployment burden","Trust requirements","PLG viability"],datasets:[{label:"Your company",data:dims,backgroundColor:"rgba(27,58,107,.15)",borderColor:"#1B3A6B",borderWidth:2,pointBackgroundColor:"#1B3A6B",pointRadius:3},{label:"Archetype "+arch+" benchmark",data:bench,backgroundColor:"rgba(0,0,0,0)",borderColor:"rgba(0,0,0,.25)",borderWidth:1.5,borderDash:[4,3],pointRadius:2,pointBackgroundColor:"rgba(0,0,0,.3)"}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:10,ticks:{display:false},grid:{color:gc},angleLines:{color:gc},pointLabels:{color:tc2,font:{size:10}}}},plugins:{legend:{display:true,position:"bottom",labels:{font:{size:10},boxWidth:10,padding:10,color:tc2}},tooltip:{callbacks:{label:function(c){return c.dataset.label+": "+c.formattedValue;}}}}}});
+}
+
+function buildDT(){
+var el=document.getElementById("dtqs");
+el.innerHTML=DT_QS.map(function(q,i){
+return'<div class="dt-q" id="dtq'+i+'"><p>'+(i+1)+". "+q.q+'</p><div class="dt-btns"><button class="dt-btn yes" onclick="dtSel('+i+',1)">Yes</button><button class="dt-btn no" onclick="dtSel('+i+',0)">No</button></div><div id="dth'+i+'" style="font-size:11px;color:var(--muted);margin-top:6px;display:none"></div></div>';
+}).join("");
+}
+
+var dtAnswers={};
+function dtSel(idx,val){
+dtAnswers[idx]=val;
+var q=DT_QS[idx];
+document.getElementById("dtq"+idx).querySelectorAll(".dt-btn").forEach(function(b){b.classList.remove("sel");});
+document.getElementById("dtq"+idx).querySelector(val?".yes":".no").classList.add("sel");
+var hint=document.getElementById("dth"+idx);
+hint.textContent=val?q.y:q.n;
+hint.style.display="block";
+if(Object.keys(dtAnswers).length===DT_QS.length){showDTResult();}
+}
+
+function showDTResult(){
+var yCount=Object.values(dtAnswers).filter(function(v){return v===1;}).length;
+var trustY=dtAnswers[0]===1;
+var implY=dtAnswers[1]===1;
+var plgY=dtAnswers[2]===1;
+var partY=dtAnswers[3]===1;
+var expY=dtAnswers[4]===1;
+var govY=dtAnswers[5]===1;
+var arch="D";
+if(trustY&&implY&&!plgY)arch="A";
+else if(trustY&&implY&&plgY)arch="B";
+else if(!trustY&&plgY&&partY)arch="C";
+else if(!trustY&&plgY&&!partY)arch="D";
+var a=ARCHETYPES[arch];
+var el=document.getElementById("dtResult");
+el.innerHTML='<div class="ibox"><strong>Decision tree recommendation: Archetype '+arch+' — '+a.name+'</strong><br><span style="font-size:12px">'+a.tag+'</span></div>';
+el.classList.remove("hidden");
+}
+
+function goStep(n){
+for(var i=1;i<=6;i++){
+var id=i<=5?"step"+i:"step6";
+var el=document.getElementById(id);
+if(el){if(i===n)el.classList.remove("hidden");else el.classList.add("hidden");}
+var pn=document.getElementById("pn"+i);
+if(pn){pn.classList.remove("active","done");if(i<n)pn.classList.add("done");else if(i===n)pn.classList.add("active");}
+}
+window.scrollTo(0,0);
+if(n===2)sUpdate();
+if(n===3)renderFinLive();
+if(n===5)buildDT();
+}
+
+document.addEventListener("input",function(e){
+var finIds=["newCusts","smSpend","acv","lifetime","grossMargin","ebitdaMargin","nrr","arr","cash","burn"];
+if(finIds.indexOf(e.target.id)>-1)renderFinLive();
+});
+
+function renderFinLive(){
+var f=getFin();
+var items=[
+{l:"CAC",v:fUSD(f.cac)},
+{l:"LTV : CAC",v:f.ltvcac?fNum(f.ltvcac,1)+"×":"—",cls:f.ltvcac?mSt(f.ltvcac,1.5,3,5,false):""},
+{l:"Payback",v:f.payback?fNum(f.payback,0)+" mo":"—",cls:f.payback?mSt(f.payback,6,12,24,true):""},
+{l:"Rule of 40",v:f.r40!==null?fNum(f.r40,0)+"%":"—",cls:f.r40!==null?mSt(f.r40,0,20,40,false):""}
+];
+var el=document.getElementById("finLiveGrid");
+if(el)el.innerHTML=items.map(function(i){return'<div class="mc"><div class="ml">'+i.l+'</div><div class="mv '+(i.cls||"")+'">'+i.v+'</div></div>';}).join("");
+}
+
+function buildResults(){
+goStep(6);
+resultsBuilt=true;
+var arm=getARM();
+var a=ARCHETYPES[arm.arch];
+var f=getFin();
+var co=document.getElementById("coName").value||"Your Company";
+var sector=document.getElementById("sector").value||"Enterprise SaaS";
+var stage=document.getElementById("stage").value||"growth";
+var govScore=parseInt(document.getElementById("s6").value)||2;
+var govGap=Math.max(0,a.govMin-govScore);
+var stageL={early:"Early stage",growth:"Growth stage",scale:"Scale stage",enterprise:"Enterprise"}[stage]||"Growth stage";
+var h="";
+
+// ─ Header ─
+h+='<div class="rhdr" style="background:var(--navy)">';
+h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">';
+h+='<div><p style="font-size:10px;font-weight:800;letter-spacing:.12em;color:rgba(255,255,255,.6);margin-bottom:5px">GTM STRATEGY — '+co.toUpperCase()+'</p>';
+h+='<h2 style="font-size:22px">Archetype '+arm.arch+': '+a.name+'</h2>';
+h+='<p style="font-size:14px;margin-bottom:10px">'+a.tag+'</p>';
+h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+h+='<span class="badge" style="background:'+a.bg+';color:'+a.color+'">ARM score '+arm.score.toFixed(1)+' / 10</span>';
+h+='<span class="badge bnavy" style="border:1px solid rgba(255,255,255,.3)">'+a.model+'</span>';
+h+='<span class="badge bgold">Benchmark: '+a.refs.join(", ")+'</span>';
+h+='<span class="badge" style="background:rgba(255,255,255,.12);color:#fff">'+stageL+'</span>';
+h+='<span class="badge" style="background:rgba(255,255,255,.12);color:#fff">'+sector+'</span>';
+h+='</div></div>';
+h+='<div style="text-align:right"><p style="font-size:10px;opacity:.55;margin-bottom:4px">GTM SPECTRUM POSITION</p>';
+h+='<div class="spec-wrap" style="width:200px;margin:0"><div class="spec-bar" style="height:8px"></div><div class="spec-mk" style="left:'+a.specPct+'%"></div></div></div>';
+h+='</div></div>';
+
+// ─ Phase 1: Control Question ─
+h+='<div class="phase-hdr">The Control Question & GTM Scaling Challenges</div>';
+h+='<div class="card"><div class="ctitle">Why this matters for '+co+'</div>';
+h+='<div class="gbox" style="margin-bottom:.75rem"><strong>The core question:</strong> Where must '+co+' retain control, and where can it safely distribute control for leverage?</div>';
+h+='<div class="g5">';
+var ch5=[["Rising CAC","Acquisition cost rises as early adopters give way to competitive markets"],["Longer Cycles","Multi-stakeholder deals extend timelines and weaken forecast confidence"],["Effort-Linked Growth","Revenue requires proportional headcount — operating leverage doesn't materialise"],["Expansion Cost","Every new geography requires full GTM rebuild, not extension"],["Predictability Falls","Revenue variation exceeds governance capacity to standardise"]];
+ch5.forEach(function(c,i){h+='<div class="fw-box" style="text-align:center"><div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:4px">'+(i+1)+". "+c[0]+'</div><div style="font-size:11px;color:var(--muted);line-height:1.4">'+c[1]+'</div></div>';});
+h+='</div></div>';
+
+// ─ ODG ─
+h+='<div class="phase-hdr">Control Placement: Own · Distribute · Govern</div>';
+h+='<div class="card"><div class="odg">';
+h+='<div class="odg-o"><h4>Own directly</h4><ul>'+a.own.map(function(x){return'<li>'+x+'</li>';}).join("")+'</ul></div>';
+h+='<div class="odg-d"><h4>Distribute selectively</h4><ul>'+a.distribute.map(function(x){return'<li>'+x+'</li>';}).join("")+'</ul></div>';
+h+='<div class="odg-g"><h4>Govern tightly</h4><ul>'+a.govern.map(function(x){return'<li>'+x+'</li>';}).join("")+'</ul></div>';
+h+='</div></div>';
+
+// ─ Framework Analysis ─
+h+='<div class="phase-hdr">Framework Analysis</div>';
+h+='<div class="card"><div class="ctitle">Cost vs Control analysis</div>';
+var smPctVal=f.smPct;
+var costCtrlMsg="";
+if(smPctVal){
+if(smPctVal>a.budgetSM[1]&&govScore<3)costCtrlMsg='<div class="wbox"><strong>Carrying cost without leverage.</strong> S&M spend is above archetype range ('+fNum(smPctVal,1)+'% of ARR vs. target '+a.budgetSM[0]+'–'+a.budgetSM[1]+'%) and governance maturity is low. '+co+' is absorbing the cost of direct control without the accountability that justifies it.</div>';
+else if(smPctVal<a.budgetSM[0]&&govScore<3)costCtrlMsg='<div class="rbox"><strong>Leverage without accountability.</strong> S&M spend is below archetype range and governance is low. '+co+' is distributing the GTM motion without the governance to protect quality, customer signal, or expansion economics.</div>';
+else if(smPctVal>=a.budgetSM[0]&&smPctVal<=a.budgetSM[1]&&govScore>=3)costCtrlMsg='<div class="ibox"><strong>Cost and control are appropriately balanced.</strong> S&M spend is within archetype range and governance maturity supports the partner model.</div>';
+else costCtrlMsg='<div class="gbox">S&M spend is within a reasonable range for Archetype '+arm.arch+'. Continue monitoring S&M efficiency as partner scale increases.</div>';
+}else{costCtrlMsg='<div class="ibox">Enter financial data on Step 3 to get a Cost vs Control assessment for '+co+'.</div>';}
+h+=costCtrlMsg;
+h+='<div class="g3" style="margin-top:.75rem">';
+h+='<div class="fw-box"><div class="fw-t">Direct control cost</div><div style="font-size:12px;color:var(--muted)">S&M budget covers trust-building, closing, and expansion where direct ownership is essential.</div><div style="margin-top:6px;font-size:13px;font-weight:700">'+fUSD(f.sm)+'<span style="font-size:11px;font-weight:400;color:var(--muted)"> / year</span></div></div>';
+h+='<div class="fw-box"><div class="fw-t">Partner leverage cost</div><div style="font-size:12px;color:var(--muted)">Partner enablement, certification, MDF, and governance platform investment.</div><div style="margin-top:6px;font-size:13px;font-weight:700">'+(f.arr>0?fUSD(f.arr*0.04):"Enter ARR")+'<span style="font-size:11px;font-weight:400;color:var(--muted)"> target / year</span></div></div>';
+h+='<div class="fw-box"><div class="fw-t">Governance cost</div><div style="font-size:12px;color:var(--muted)">QA systems, certification workflows, partner scoring, AI review infrastructure.</div><div style="margin-top:6px;font-size:13px;font-weight:700">$50K – $200K<span style="font-size:11px;font-weight:400;color:var(--muted)"> annual</span></div></div>';
+h+='</div></div>';
+
+h+='<div class="card"><div class="ctitle">Scalability vs Complexity analysis</div>';
+var s3=parseInt(document.getElementById("s3").value)||5;
+var s5=parseInt(document.getElementById("s5").value)||5;
+var compMsg="";
+if(s3>=7&&govScore>=4)compMsg='<div class="ibox"><strong>Complexity converted to switching costs.</strong> High deployment burden + strong governance = the ServiceNow/Workday pattern. Implementation weight is being converted into institutional expansion advantage.</div>';
+else if(s3>=7&&govScore<3)compMsg='<div class="wbox"><strong>Complexity as friction.</strong> High deployment burden without governance infrastructure creates implementation inconsistency. At scale, this produces escalations, scope creep, and CAC inflation through reputational drag.</div>';
+else if(s3<=4&&s5>=7)compMsg='<div class="ibox"><strong>Complexity deferred through PLG.</strong> Low deployment burden + high PLG viability = the Atlassian/HubSpot pattern. Self-serve adoption can compound before implementation complexity arrives.</div>';
+else compMsg='<div class="gbox">Complexity is manageable at current scale. Monitor implementation variance as partner count and deal volume increases.</div>';
+h+=compMsg;
+h+='<div class="g3" style="margin-top:.75rem">';
+var cTypes=[["Front-loaded complexity","Requires deep implementation upfront. Builds switching costs and institutional embedding. Appropriate for Archetypes A and B.","A / B"],["Deferred complexity","Product delivers value quickly; implementation complexity arrives later. Enables PLG scale before enterprise motion begins.","C / D"],["Unconverted complexity","High implementation burden without a path to repeatable institutional value. Creates friction without switching cost benefit.","Mismatch risk"]];
+cTypes.forEach(function(c){h+='<div class="fw-box"><div class="fw-t">'+c[0]+'</div><div style="font-size:12px;color:var(--muted);line-height:1.5">'+c[1]+'</div><div style="margin-top:5px"><span class="badge bnavy" style="font-size:10px">'+c[2]+'</span></div></div>';});
+h+='</div></div>';
+
+h+='<div class="card"><div class="ctitle">Operating leverage assessment</div>';
+var levMsg="";
+if(f.nrr>=120&&f.smEff&&f.smEff>=1.5)levMsg='<div class="ibox"><strong>Leverage is compounding.</strong> NRR of '+fNum(f.nrr,0)+'% + S&M efficiency of '+fNum(f.smEff,2)+'× indicates product-embedded leverage is materialising. The installed base is expanding faster than the cost to serve it.</div>';
+else if(f.nrr>=110&&f.nrr<120)levMsg='<div class="gbox"><strong>Early leverage signals present.</strong> NRR of '+fNum(f.nrr,0)+'% indicates expansion is outpacing churn. Continue building governance to protect and compound this trend.</div>';
+else if(f.nrr>0&&f.nrr<100)levMsg='<div class="rbox"><strong>Leverage is not yet present — churn is masking the growth problem.</strong> NRR of '+fNum(f.nrr,0)+'% means the installed base is contracting. GTM investment is filling a leaky bucket. Prioritise retention before scaling acquisition.</div>';
+else levMsg='<div class="gbox">Enter NRR and financial data on Step 3 to assess operating leverage for '+co+'.</div>';
+h+=levMsg;
+h+='<div class="g3" style="margin-top:.75rem">';
+var levTypes=[["Installed-base expansion","NRR >110% signals that existing customers expand. This is the highest-quality leverage — product creates revenue without incremental S&M.","Target: NRR ≥ "+a.targetR40+"%"],["Referral acquisition","Existing customers sourcing new pipeline. Implies product credibility and lowers effective CAC over time.","Track: Referral % of new logo"],["Ecosystem leverage","Partners, marketplace, and integrations generating demand without proportional direct S&M investment.","Target for Arch "+arm.arch+": "+(f.pp>0?fNum(f.pp,0)+"% partner":"Track partner % of ARR")]];
+levTypes.forEach(function(l){h+='<div class="fw-box"><div class="fw-t">'+l[0]+'</div><div style="font-size:12px;color:var(--muted);line-height:1.5">'+l[1]+'</div><div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--navy)">'+l[2]+'</div></div>';});
+h+='</div></div>';
+
+// ─ Financial Dashboard ─
+h+='<div class="phase-hdr">Financial Health Dashboard</div>';
+h+='<div class="card"><div class="ctitle">Unit economics</div>';
+function mc2(l,v,f2,fc,s){return'<div class="mc"><div class="ml">'+l+'</div><div class="mv '+(fc||"")+'">'+v+'</div>'+(f2?'<div class="mf '+(fc||"")+'">'+f2+'</div>':'')+(s?'<div class="ms">'+s+'</div>':'')+'</div>';}
+var mcs="";
+if(f.cac)mcs+=mc2("CAC",fUSD(f.cac),null,"","S&M ÷ new customers");
+if(f.ltvcac){var lc=f.ltvcac;var lcC=lc>=5?"c-great":lc>=3?"c-good":lc>=1.5?"c-warn":"c-bad";var lcF=lc>=5?"Strong ✓":lc>=3?"Healthy ✓":lc>=1.5?"Developing ⚠":"Unsustainable ✗";mcs+=mc2("LTV : CAC",fNum(f.ltvcac,1)+"×",lcF,lcC,"Target ≥ "+a.targetLTV.toFixed(1)+"×");}
+if(f.payback){var pb=f.payback;var pbC=pb<=a.targetCAC[0]?"c-great":pb<=a.targetCAC[1]?"c-good":pb<=30?"c-warn":"c-bad";var pbF=pb<=a.targetCAC[0]?"Excellent ✓":pb<=a.targetCAC[1]?"On track ✓":pb<=30?"Extended ⚠":"Critical ✗";mcs+=mc2("CAC Payback",fNum(f.payback,0)+" mo",pbF,pbC,"Target "+a.targetCAC[0]+"–"+a.targetCAC[1]+" mo");}
+if(f.r40!==null){var r40C=f.r40>=60?"c-great":f.r40>=40?"c-good":f.r40>=20?"c-warn":"c-bad";var r40F=f.r40>=60?"Exceptional ✓":f.r40>=40?"Healthy ✓":f.r40>=20?"Developing ⚠":"Below threshold ✗";mcs+=mc2("Rule of 40",fNum(f.r40,0)+"%",r40F,r40C,"Target ≥ "+a.targetR40+"%");}
+if(f.ltv)mcs+=mc2("Customer LTV",fUSD(f.ltv),null,"","Over "+f.lt+" yr lifetime");
+if(f.smPct){var sp=f.smPct;var spC=sp>=a.budgetSM[0]&&sp<=a.budgetSM[1]?"c-good":sp<a.budgetSM[0]?"c-warn":"c-warn";var spF=sp>=a.budgetSM[0]&&sp<=a.budgetSM[1]?"In range ✓":sp<a.budgetSM[0]?"Below range":"Above range";mcs+=mc2("S&M % of ARR",fPct(f.smPct),spF,spC,"Target "+a.budgetSM[0]+"–"+a.budgetSM[1]+"%");}
+if(f.smEff){var seC=f.smEff>=1.5?"c-great":f.smEff>=1?"c-good":f.smEff>=0.6?"c-warn":"c-bad";var seF=f.smEff>=1.5?"High efficiency ✓":f.smEff>=1?"Efficient ✓":f.smEff>=0.6?"Moderate ⚠":"Low ✗";mcs+=mc2("S&M Efficiency",fNum(f.smEff,2)+"×",seF,seC,"New ARR per $1 S&M");}
+if(f.nrr){var nC=f.nrr>=120?"c-great":f.nrr>=110?"c-good":f.nrr>=100?"c-warn":"c-bad";var nF=f.nrr>=120?"Strong expansion ✓":f.nrr>=110?"Growing ✓":f.nrr>=100?"Flat — at risk ⚠":"Churning ✗";mcs+=mc2("NRR",fNum(f.nrr,0)+"%",nF,nC,"Expansion economics quality");}
+if(f.runway)mcs+=mc2("Runway",fNum(f.runway,1)+" mo",f.runway<12?"⚠ Under 12 months":f.runway<18?"Plan raise soon":"Sufficient",f.runway<12?"c-bad":f.runway<18?"c-warn":"c-good","Cash ÷ monthly burn");
+if(mcs){h+='<div class="g4">'+mcs+'</div>';}else{h+='<div class="ibox">Enter financial data on Step 3 to see your full financial health dashboard.</div>';}
+
+if(f.p1||f.p2||f.p3){
+h+='<div style="margin-top:1rem"><div class="fw-t">Revenue projection — growth rate × NRR compounded</div>';
+h+='<div class="proj-g">';
+if(f.p1)h+='<div class="proj-c"><div class="proj-y">Year 1</div><div class="proj-v">'+fUSD(f.p1)+'</div></div>';
+if(f.p2)h+='<div class="proj-c"><div class="proj-y">Year 2</div><div class="proj-v">'+fUSD(f.p2)+'</div></div>';
+if(f.p3)h+='<div class="proj-c"><div class="proj-y">Year 3</div><div class="proj-v">'+fUSD(f.p3)+'</div></div>';
+h+='</div>';
+if(f.expRev&&f.expRev>0)h+='<div style="font-size:12px;color:var(--muted);margin-top:6px">NRR-implied expansion revenue from existing base: <strong style="color:var(--navy)">'+fUSD(f.expRev)+'</strong> per year without adding a single new customer.</div>';
+h+='</div>';}
+
+h+='<div style="margin-top:1rem"><div class="fw-t">GTM budget guidance — Archetype '+arm.arch+' ('+stageL+')</div>';
+var arrV=f.arr||0;
+var smL=arrV*a.budgetSM[0]/100,smH=arrV*a.budgetSM[1]/100;
+var mL=smL*a.budgetMktg[0]/100,mH=smH*a.budgetMktg[1]/100;
+var budget=[["Total S&M investment",fUSD(smL)+" – "+fUSD(smH),a.budgetSM[0]+"–"+a.budgetSM[1]+"% of ARR"],["Marketing budget",fUSD(mL)+" – "+fUSD(mH),a.budgetMktg[0]+"–"+a.budgetMktg[1]+"% of S&M spend"],["Partner enablement & MDF",(arrV>0?fUSD(arrV*.03)+" – "+fUSD(arrV*.06):"3–6% of ARR"),"Certification, tools, co-marketing"],["Governance & QA platform","$50K – $200K","Fixed annual — AI QA, partner scoring, certification"]];
+budget.forEach(function(b){h+='<div class="budget-row"><div><strong style="font-size:13px">'+b[0]+'</strong><br><span style="font-size:11px;color:var(--muted)">'+b[2]+'</span></div><div style="text-align:right"><strong style="font-size:13px">'+b[1]+'</strong><br><span style="font-size:11px;color:var(--muted)">'+b[0]+'</span></div></div>';});
+h+='</div></div>';
+
+// ─ ARM Diagnostic Scorecard ─
+h+='<div class="card"><div class="ctitle">ARM diagnostic scorecard</div>';
+h+='<table class="sc-table"><tr><th>Dimension</th><th>Your score</th><th>Rating</th><th>Archetype A</th><th>Arch B</th><th>Arch C</th><th>Arch D</th></tr>';
+var scDims=["Product complexity","Buyer complexity","Deployment burden","Trust requirements","PLG viability"];
+var benchAll={A:[9,9,8,9,2],B:[8,8,7,8,3],C:[6,7,5,6,7],D:[5,4,3,5,9]};
+var userDims=getARM().dims;
+scDims.forEach(function(d,i){
+var v=userDims[i];
+var dots="";for(var j=1;j<=10;j++)dots+='<span class="rd'+(j<=v?" f":"")+'"></span>';
+h+='<tr><td style="font-weight:600">'+d+'</td><td><strong>'+v+'</strong> / 10</td><td>'+dots+'</td><td>'+benchAll.A[i]+'</td><td>'+benchAll.B[i]+'</td><td>'+benchAll.C[i]+'</td><td>'+benchAll.D[i]+'</td></tr>';
+});
+h+='<tr><td style="font-weight:800">ARM Score</td><td colspan="2"><strong class="'+arm.arch==="A"?"c-bad":arm.arch==="B"?"c-warn":arm.arch==="C"?"c-good":"c-great"+'">'+arm.score.toFixed(1)+'</strong></td><td><strong>7.5–10</strong></td><td><strong>5.5–7.4</strong></td><td><strong>3.5–5.4</strong></td><td><strong>1–3.4</strong></td></tr>';
+h+='</table></div>';
+
+// ─ Governance & Model Strain ─
+h+='<div class="card"><div class="ctitle">Governance maturity assessment</div>';
+h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px">Current maturity: <strong>'+govScore+'/5</strong> — '+GOV_LBLS[govScore]+'</span>';
+var gC=govScore>=4?"c-good":govScore>=3?"c-warn":"c-bad";
+h+='<span class="badge" style="background:'+a.bg+';color:'+a.color+'">'+["","Critical","Low","Developing","Structured","Governed"][govScore]+'</span></div>';
+if(govGap>0){h+='<div class="wbox">Governance gap: <strong>'+govGap+' level'+(govGap>1?"s":"")+'</strong> below minimum recommended for Archetype '+arm.arch+' ('+a.name+') model. Partner scale without governance creates deferred execution risk — scaling partner count before governance is ready is the most common GTM failure pattern identified in this study.</div>';}
+else{h+='<div class="ibox">Governance maturity meets the minimum threshold for Archetype '+arm.arch+'. Continue building toward full governance as partner network scales.</div>';}
+h+='<div style="margin-top:.875rem"><div class="fw-t">Model strain early warning signals</div>';
+a.strains.forEach(function(s){h+='<div class="strain-item"><span style="color:var(--danger);flex-shrink:0">▲</span><span>'+s+'</span></div>';});
+h+='</div></div>';
+
+// ─ Partner Role Map ─
+h+='<div class="card"><div class="ctitle">Partner role classification (Archetype '+arm.arch+')</div>';
+h+='<div class="ibox" style="margin-bottom:.875rem">The framework\'s central distinction: <strong>partner position, not partner presence,</strong> determines GTM economics. Each role carries different CAC, margin, governance, and expansion implications.</div>';
+var prRoles=[
+{r:"Demand layer",d:"Partners upstream of the commercial conversation. Generate leads, warm introductions, or co-sell influence.",fit:["C","D"],caution:["A"]},
+{r:"Procurement layer",d:"Cloud marketplace or resale channel. Reduces buying friction, accesses budget pools, accelerates procurement cycles.",fit:["C","D"],caution:["A","B"]},
+{r:"Delivery layer",d:"Implementation, onboarding, and technical deployment. Scales execution capacity without proportional headcount.",fit:["B","C"],caution:[]},
+{r:"Co-creation layer",d:"GSI or ISV partners who build industry IP on the platform. Raises switching costs and amplifies enterprise value.",fit:["B"],caution:["D"]},
+{r:"Retention layer",d:"Partners who own post-sale customer success, adoption monitoring, and renewal conversations.",fit:["D"],caution:["A"]},
+{r:"Expansion layer",d:"Partners who drive multi-module, multi-seat, or workflow expansion within the installed base.",fit:["C","D"],caution:["A"]}];
+h+='<div class="g2">';
+prRoles.forEach(function(r){
+var isFit=r.fit.indexOf(arm.arch)>-1;
+var isCaution=r.caution.indexOf(arm.arch)>-1;
+var bg=isFit?"var(--green-lt)":isCaution?"var(--red-lt)":"var(--bg)";
+var bc=isFit?"var(--green)":isCaution?"var(--red)":"var(--border)";
+var tag=isFit?'<span class="badge bd" style="font-size:9px">Recommended</span>':isCaution?'<span class="badge ba" style="font-size:9px">Exercise caution</span>':'<span class="badge" style="background:var(--bg);color:var(--muted);font-size:9px">Neutral</span>';
+h+='<div class="fw-box" style="background:'+bg+';border-color:'+bc+'"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px"><strong style="font-size:12px">'+r.r+'</strong>'+tag+'</div><div style="font-size:12px;color:var(--muted);line-height:1.4">'+r.d+'</div></div>';
+});
+h+='</div></div>';
+
+// ─ Decision Tree Summary ─
+h+='<div class="card"><div class="ctitle">GTM Decision Tree — control boundary summary</div>';
+if(Object.keys(dtAnswers).length===DT_QS.length){
+DT_QS.forEach(function(q,i){
+var ans=dtAnswers[i];
+h+='<div class="wi"><span style="color:'+(ans?"var(--green)":"var(--red)")+';flex-shrink:0;font-weight:800">'+(ans?"Yes":"No")+'</span><div><span style="font-weight:500">'+q.q+'</span><br><span style="font-size:11px;color:var(--muted)">'+(ans?q.y:q.n)+'</span></div></div>';
+});
+}else{h+='<div class="ibox">Complete the decision tree on Step 5 to see the full control boundary analysis.</div>';}
+h+='</div>';
+
+// ─ Five Structural Findings ─
+h+='<div class="phase-hdr">Five Structural Findings</div>';
+h+='<div class="card">';
+PATTERNS.forEach(function(p){
+h+='<div class="finding-item"><span class="finding-num">'+p.n+'</span><strong style="font-size:13px">'+p.t+'</strong><p style="font-size:13px;color:var(--muted);line-height:1.6;margin-top:4px;margin-left:30px">'+p.b+'</p></div>';
+});
+h+='</div>';
+
+h+='<div class="card"><div class="ctitle">Watchpoints for '+co+'</div>';
+a.watch.forEach(function(w){h+='<div class="wi"><span class="wi-ico">▲</span><span>'+w+'</span></div>';});
+h+='</div>';
+h+='<div class="card"><div class="ctitle">Priority actions</div>';
+a.priorities.forEach(function(p,i){h+='<div class="pri"><div class="pri-n">'+(i+1)+'</div><span style="font-size:13px">'+p+'</span></div>';});
+h+='</div></div>';
+
+// ─ Benchmark: 11 Companies ─
+h+='<div class="card"><div class="ctitle">Benchmark comparison — 11 company study</div>';
+h+='<div style="font-size:12px;color:var(--muted);margin-bottom:.875rem">6 core reference companies + 5 validation companies. Your ARM score of <strong>'+arm.score.toFixed(1)+'</strong> positions '+co+' closest to: <span style="font-weight:700">'+a.refs.join(", ")+'</span></div>';
+h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+h+='<tr style="background:var(--navy);color:#fff"><th style="padding:6px 10px;text-align:left">Company</th><th style="padding:6px 10px;text-align:left">Archetype</th><th style="padding:6px 10px;text-align:left">ARM Score</th><th style="padding:6px 10px;text-align:left">GTM Model</th><th style="padding:6px 10px;text-align:left">Type</th></tr>';
+BENCHMARKS.forEach(function(b,idx){
+var isMatch=b.arch===arm.arch;
+var bg=isMatch?(idx%2===0?"#F0F5FF":"#E8F0FF"):(idx%2===0?"#fff":"var(--bg)");
+var arcColors={A:"var(--red)",B:"var(--orange)",C:"var(--blue)",D:"var(--green)"};
+h+='<tr style="background:'+bg+'">';
+h+='<td style="padding:6px 10px;font-weight:'+(isMatch?"800":"500")+';color:'+(isMatch?"var(--navy)":"var(--text)")+'">'+b.name+(isMatch?' <span class="badge bnavy" style="font-size:9px;margin-left:4px">nearest match</span>':'')+'</td>';
+h+='<td style="padding:6px 10px"><span class="badge b'+b.arch.toLowerCase()+'" style="font-size:10px">'+b.arch+'</span></td>';
+h+='<td style="padding:6px 10px"><div class="abar" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px"><div class="abar-f" style="width:'+(b.score)+'%;background:'+arcColors[b.arch]+'"></div></div>'+b.score+'</td>';
+h+='<td style="padding:6px 10px;color:var(--muted)">'+b.model+'</td>';
+h+='<td style="padding:6px 10px"><span class="badge" style="font-size:9px;background:'+(b.status==="core"?"var(--navy-lt)":"var(--bg)")+';color:'+(b.status==="core"?"var(--navy)":"var(--muted)")+'">'+b.status+'</span></td>';
+h+='</tr>';
+});
+h+='</table></div></div>';
+
+// ─ External Validation ─
+h+='<div class="phase-hdr">Market Evidence Supporting the Framework</div>';
+h+='<div class="card"><div class="ctitle">External literature validation</div>';
+h+='<div class="gbox"><strong>Core claim:</strong> Public GTM literature validates the component parts of this framework, but the differentiated contribution of this work is the integration of those parts into a comprehensive Enterprise SaaS GTM control-placement framework. The market is discussing the ingredients. This framework assembles the operating system.</div>';
+h+='<div style="margin-top:.875rem">';
+EXT_SRCS.forEach(function(s){h+='<div class="ext-src"><span class="ext-num">['+s.n+']</span><div><strong>'+s.src+'</strong> — <span style="color:var(--muted)">'+s.claim+'</span></div></div>';});
+h+='</div></div>';
+
+// ─ Closing Judgment ─
+h+='<div class="card" style="border:2px solid var(--gold);background:var(--gold-lt)">';
+h+='<div style="text-align:center;padding:.5rem 0">';
+h+='<div style="font-size:10px;font-weight:800;letter-spacing:.12em;color:#854F0B;margin-bottom:8px">THE CLOSING JUDGMENT</div>';
+h+='<p style="font-size:15px;font-weight:700;color:var(--navy);line-height:1.7;max-width:680px;margin:0 auto">SaaS GTM scale improves when leadership places control where it protects value, introduces leverage where the system can absorb it, and governs the boundary before complexity compounds.</p>';
+
+h+='</div></div>';
+h+='<div style="text-align:center;margin-top:1rem;font-size:11px;color:var(--muted)">© Ritesh Sethi, IIM Kozhikode. All rights reserved.</div>';
+
+document.getElementById("resContent").innerHTML=h;
+}
+
+sUpdate();govUp();
+</script>
+</body>
+</html>
